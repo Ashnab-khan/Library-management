@@ -2,14 +2,25 @@ import express from "express"
 import mysql from "mysql"
 import cors from "cors"
 
+import dotenv from "dotenv";
+
+dotenv.config(); // Load .env variables
+
 const app = express()
 
+// const db = mysql.createConnection({
+//     host: "localhost",
+//     user: "root",
+//     password: "admin123",
+//     database: "librarymanagement"
+// })
+
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "admin123",
-    database: "librarymanagement"
-})
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 
 app.use(express.json())
 app.use(cors())
@@ -83,7 +94,12 @@ app.put("/books/:id", (req, res) => {
 //--------------- Update condition ---------------
 
 // to run on this port method 
-app.listen(8800, () => {
-    console.log("Connect with Backend!");
+// app.listen(8800, () => {
+//     console.log("Connect with Backend!");
 
-})
+// })
+
+// rest of your routes...
+app.listen(process.env.PORT || 8800, () => {
+  console.log(`Backend running on port ${process.env.PORT || 8800}`);
+});
