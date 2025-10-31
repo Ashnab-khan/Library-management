@@ -16,18 +16,19 @@ const app = express()
 // })
 
 const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT, // ✅ Add this lin
 });
 
 db.connect((err) => {
-  if (err) {
-    console.error("❌ Database connection failed:", err);
-  } else {
-    console.log("✅ Connected to MySQL Database!");
-  }
+    if (err) {
+        console.error("❌ Database connection failed:", err);
+    } else {
+        console.log("✅ Connected to MySQL Database!");
+    }
 });
 
 
@@ -95,7 +96,7 @@ app.put("/books/:id", (req, res) => {
         req.body.cover,
     ]
 
-    db.query(q, [...values,bookId], (err, data) => {
+    db.query(q, [...values, bookId], (err, data) => {
         if (err) return res.json(err)
         return res.json("Books has been Updated Succesfully")
     })
@@ -110,5 +111,5 @@ app.put("/books/:id", (req, res) => {
 
 // rest of your routes...
 app.listen(process.env.PORT || 8800, () => {
-  console.log(`Backend running on port ${process.env.PORT || 8800}`);
+    console.log(`Backend running on port ${process.env.PORT || 8800}`);
 });
