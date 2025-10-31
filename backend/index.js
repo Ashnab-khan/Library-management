@@ -3,10 +3,12 @@ import mysql from "mysql"
 import cors from "cors"
 
 import dotenv from "dotenv";
+import pkg from "pg";
 
 dotenv.config(); // Load .env variables
 
 const app = express()
+const { Pool } = pkg;
 
 // const db = mysql.createConnection({
 //     host: "localhost",
@@ -15,11 +17,13 @@ const app = express()
 //     database: "librarymanagement"
 // })
 
-const db = mysql.createConnection({
+const db = new Pool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  ssl: { rejectUnauthorized: false },
 });
 
 app.use(express.json())
