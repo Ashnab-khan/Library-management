@@ -28,7 +28,7 @@ app.use(cors())
 // if there is auth problem
 // AFTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'admin123'
 app.get("/", (req, res) => {
-    res.json("hello this the backend!")
+    res.json("hello this the backend Ashnab Here!")
 })
 
 
