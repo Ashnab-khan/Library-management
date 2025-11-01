@@ -52,21 +52,42 @@ app.get("/books", (req, res) => {
 })
 
 
+// app.post("/books", (req, res) => {
+//     const q = "INSERT INTO books (`title`, `desc`, `price`, `cover`) VALUES (?)";
+
+//     const values = [
+//         req.body.title,
+//         req.body.desc,
+//         req.body.price,
+//         req.body.cover,
+//     ]
+
+//     db.query(q, [values], (err, data) => {
+//         if (err) return res.json(err);
+//         return res.json(data)
+//     })
+// })
+
+
 app.post("/books", (req, res) => {
-    const q = "INSERT INTO books (`title`, `desc`, `price`, `cover`) VALUES (?)";
+  const q = "INSERT INTO books (`title`, `desc`, `price`, `cover`) VALUES (?)";
+  const values = [
+    req.body.title,
+    req.body.desc,
+    req.body.price,
+    req.body.cover,
+  ];
 
-    const values = [
-        req.body.title,
-        req.body.desc,
-        req.body.price,
-        req.body.cover,
-    ]
+  db.query(q, [values], (err, data) => {
+    if (err) {
+      console.error("❌ SQL Insert Error:", err);
+      return res.status(500).json({ message: "Database Insert Failed", error: err });
+    }
+    console.log("✅ Book Added:", values);
+    return res.json({ success: true, data });
+  });
+});
 
-    db.query(q, [values], (err, data) => {
-        if (err) return res.json(err);
-        return res.json(data)
-    })
-})
 
 //--------------- Delete condition ---------------
 app.delete("/books/:id", (req, res) => {
