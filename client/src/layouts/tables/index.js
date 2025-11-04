@@ -33,7 +33,7 @@ import projectsTableData from "layouts/tables/data/projectsTableData";
 import "./data/EmployeeTable.css";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../tables/tables.css"
 
 
@@ -93,6 +93,7 @@ const employees = [
     employed: "14/09/20",
   },
 ];
+
 function Tables() {
   const { columns, rows } = authorsTableData();
   const { columns: pColumns, rows: pRows } = projectsTableData();
@@ -102,6 +103,38 @@ function Tables() {
     price: null,
     cover: ""
   });
+
+  // Add Student useState Condition 
+  const [student, setStudent] = useState({
+    studentName: "",
+    rollNo: "",
+    std: "",
+    div: "",
+    bookName: "",
+    currentDate: "",
+    lastDate: ""
+  });
+
+  // ------------------------------------------------------------------
+  const [tableBooks, setTableBooks] = useState([]);
+  // all books from your API and store them in a local state.
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const res = await axios.get("https://library-management-s4mr.onrender.com/librarybooks");
+        setTableBooks(res.data); // Assuming your API returns an array of books
+      } catch (err) {
+        console.log("Error fetching books:", err);
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
+  const handleTableBooks = (e) => {
+    setStudent((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+  // ----------------------- your API and store books ---------------------
 
 
   const navigate = useNavigate()
@@ -164,6 +197,43 @@ function Tables() {
               </div>
               <div className="tables-form-btn">
                 <button className='formbutton' onClick={handleClick}>Added</button>
+              </div>
+            </div>
+
+            <div className='form Student-tables-form '>
+              <h3>Add Student Data</h3>
+              <div >
+                <div className="Student-form-input">
+                  <input className="tables-input-child" type="text" placeholder='Student Name' onChange={handleChange} name='title' />
+                  <input className="tables-input-child" type="number" placeholder='Student RollNo' onChange={handleChange} name='desc' />
+                  <input className="tables-input-child" type="number" placeholder='STD(class)' onChange={handleChange} name='price' />
+                  <input className="tables-input-child" type="text" placeholder='Div(A,B,C...)' onChange={handleChange} name='cover' />
+                </div>
+                <div className="Student-form-input">
+                  {/* <input className="tables-input-child" type="text" placeholder='BookName' onChange={handleChange} name='cover' /> */}
+                  <div className="Student-form-input">
+                    {/* Dropdown for Book Name */}
+                    <select
+                      className="tables-input-child"
+                      name="bookName"
+                      onChange={handleTableBooks}
+                      value={student.bookName}
+                    >
+                      <option value="">Select Book</option>
+                      {tableBooks.map((book) => (
+                        <option key={book.id} value={book.title}>
+                          {book.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <input className="tables-input-child" type="number" placeholder='Current Date' onChange={handleChange} name='cover' />
+                  <input className="tables-input-child" type="number" placeholder='Last Date' onChange={handleChange} name='cover' />
+                </div>
+              </div>
+              <div className="tables-form-btn">
+                <button className='formbutton'>Added</button>
               </div>
             </div>
           </Grid>

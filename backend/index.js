@@ -204,6 +204,33 @@ app.delete("/librarybooks/:id", (req, res) => {
 
 // })
 
+// --------------------------------------------
+// --------------------------------------------
+app.post("/studentdata", (req, res) => {
+  const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `bookName`, `currentDate`, `lastDate`) VALUES (?)";
+  
+  const values = [
+    req.body.studentName,
+    req.body.rollNo,
+    req.body.std,
+    req.body.divi, // we are reading "div" from frontend
+    req.body.bookName,
+    req.body.currentDate,
+    req.body.lastDate,
+  ];
+
+  db.query(q, [values], (err, data) => {
+    if (err) {
+      console.error("Error inserting student:", err);
+      return res.status(500).json({ message: "Database insert failed" });
+    }
+    return res.json({ message: "Student added successfully!" });
+  });
+});
+
+// --------------------------------------------
+// --------------------------------------------
+
 // rest of your routes...
 app.listen(process.env.PORT || 8800, () => {
     console.log(`Backend running on port ${process.env.PORT || 8800}`);

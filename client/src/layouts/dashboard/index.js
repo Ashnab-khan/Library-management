@@ -61,6 +61,8 @@ function Dashboard() {
 
   // ---------------------------- Delete Funcation
   const handleDelete = async (id) => {
+    console.log( "deleteid" , id);
+    
     try {
       // await axios.delete("http://localhost:8800/books/" + id)
       await axios.delete("https://library-management-s4mr.onrender.com/librarybooks/" + id)
@@ -178,7 +180,7 @@ function Dashboard() {
             </Grid> */}
 
             <Grid item xs={12} md={12} lg={12}>
-              <div>
+              <div className="main-dashboard">
                 <div className="dashboard-books" >
                   {books.map((book) => (
                     <div className="dashboard-book-child" key={book.id}>

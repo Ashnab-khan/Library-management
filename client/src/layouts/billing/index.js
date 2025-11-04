@@ -31,16 +31,16 @@ import PaymentMethod from "layouts/billing/components/PaymentMethod";
 import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../billing/billing.css"
 
 function Billing() {
-  const [book, setBook] = useState({
+  const [bookLibrary, setBookLibrary] = useState({
     title: "",
-    desc: "",
-    price: null,
+    description: "",
+    price: "",
     cover: ""
   });
 
@@ -53,17 +53,45 @@ function Billing() {
   console.log(location.pathname.split("/")[2], "location logid");
 
   const handleChange = (e) => {
-    setBook(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setBookLibrary(prev => ({ ...prev, [e.target.name]: e.target.value }))
   };
 
-  console.log(book, "checkingvalue is coming");
+  console.log("checking Previous value" ,bookLibrary );
 
+
+  // ---------------------------------------
+  //  Fetch book details when component loads
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const res = await axios.get(`https://library-management-s4mr.onrender.com/librarybooks`);
+        // find the specific book by ID
+        const selectedBook = res.data.find((b) => b.id === parseInt(bookId));
+        if (selectedBook) {
+          setBookLibrary({
+            title: selectedBook.title,
+            description: selectedBook.description,
+            price: selectedBook.price,
+            cover: selectedBook.cover,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching book details:", err);
+      }
+    };
+    fetchBook();
+  }, [bookId]);
+  //  Fetch book details when component loads
+  // ---------------------------------------
+
+
+  // ------------Update API Condition
   const handleClick = async e => {
     e.preventDefault()
     try {
       // await axios.put("http://localhost:8800/books/" + bookId , book)
       // await axios.put(`http://localhost:8800/books/${bookId}`, book)
-      await axios.put(`https://library-management-s4mr.onrender.com/librarybooks/${bookId}`, book)
+      await axios.put(`https://library-management-s4mr.onrender.com/librarybooks/${bookId}`, bookLibrary)
       navigate("/dashboard")
     } catch (err) {
       console.log(err);
@@ -111,10 +139,14 @@ function Billing() {
             <div className='form billing-form'>
               <h3>Update The Book</h3>
               <div className="billing-form-input">
-                <input className="billing-input-child" type="text" placeholder='title' onChange={handleChange} name='title' />
-                <input className="billing-input-child" type="text" placeholder='desc' onChange={handleChange} name='desc' />
-                <input className="billing-input-child" type="number" placeholder='price' onChange={handleChange} name='price' />
-                <input className="billing-input-child" type="text" placeholder='cover' onChange={handleChange} name='cover' />
+                <input className="billing-input-child" type="text" placeholder='title'
+                  value={bookLibrary.title} onChange={handleChange} name='title' />
+                <input className="billing-input-child" type="text" placeholder='description'
+                  value={bookLibrary.description} onChange={handleChange} name='description' />
+                <input className="billing-input-child" type="number" placeholder='price'
+                  value={bookLibrary.price} onChange={handleChange} name='price' />
+                <input className="billing-input-child" type="text" placeholder='cover'
+                  value={bookLibrary.cover} onChange={handleChange} name='cover' />
               </div>
               <div className="billing-form-btn">
                 <button className='formbutton' onClick={handleClick}>Update</button>
