@@ -205,33 +205,33 @@ app.delete("/librarybooks/:id", (req, res) => {
 // })
 
 
-// --------------------------------------------------
+// --------------------------------------------------------
 // studentdata
-// --------------------------------------------------
+// --------------------------------------------------------
 app.post("/studentdata", (req, res) => {
-  const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `bookName`, `currentDate`, `lastDate`) VALUES (?)";
-  
-  const values = [
-    req.body.studentName,
-    req.body.rollNo,
-    req.body.std,
-    req.body.divi, // we are reading "div" from frontend
-    req.body.bookName,
-    req.body.currentDate,
-    req.body.lastDate,
-  ];
+    const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `bookName`, `currentDate`, `lastDate`) VALUES (?)";
 
-  db.query(q, [values], (err, data) => {
-    if (err) {
-      console.error("Error inserting student:", err);
-      return res.status(500).json({ message: "Database insert failed" });
-    }
-    return res.json({ message: "Student added successfully!" });
-  });
+    const values = [
+        req.body.studentName,
+        req.body.rollNo,
+        req.body.std,
+        req.body.divi, // we are reading "div" from frontend
+        req.body.bookName,
+        req.body.currentDate,
+        req.body.lastDate,
+    ];
+
+    db.query(q, [values], (err, data) => {
+        if (err) {
+            console.error("Error inserting student:", err);
+            return res.status(500).json({ message: "Database insert failed" });
+        }
+        return res.json({ message: "Student added successfully!" });
+    });
 });
 
 
-// --------------------------------------------
+// --------------------get------------------------
 app.get("/studentdata", (req, res) => {
     const q = "SELECT * FROM studentdata"
     db.query(q, (err, data) => {
@@ -239,10 +239,52 @@ app.get("/studentdata", (req, res) => {
         return res.json(data)
     })
 })
+// --------------------get------------------------
 
 
-// --------------------------------------------
-// --------------------------------------------
+//--------------- Update condition ---------------
+app.put("/studentdata/:id", (req, res) => {
+    // this params represent /books
+    const bookId = req.params.id;
+    // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
+    const q = "UPDATE studentdata SET `title`=?, `description`=?, `price`=?, `cover`=? WHERE id=?"
+
+
+    const values = [
+        req.body.studentName,
+        req.body.rollNo,
+        req.body.std,
+        req.body.divi, // we are reading "div" from frontend
+        req.body.bookName,
+        req.body.currentDate,
+        req.body.lastDate,
+    ]
+
+    db.query(q, [...values, bookId], (err, data) => {
+        if (err) return res.json(err)
+        return res.json("librarybooks has been Updated Succesfully")
+    })
+})
+//--------------- Update condition ---------------
+
+
+//--------------- delete condition ---------------
+app.delete("/studentdata/:id", (req, res) => {
+    // this params represent /books
+    const bookId = req.params.id;
+    // const q = "DELETE FROM books WHERE id = ?"
+    const q = "DELETE FROM studentdata WHERE id = ?"
+
+    db.query(q, [bookId], (err, data) => {
+        if (err) return res.json(err)
+        return res.json("librarybooks has been DELETED Succesfully")
+    })
+})
+//--------------- delete condition ---------------
+
+// ----------------------------------------------------------
+// studentdata
+// ----------------------------------------------------------
 
 // rest of your routes...
 app.listen(process.env.PORT || 8800, () => {
