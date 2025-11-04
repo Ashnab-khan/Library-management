@@ -240,7 +240,7 @@ app.put("/studentdata/:id", (req, res) => {
     // this params represent /books
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE studentdata SET `title`=?, `description`=?, `price`=?, `cover`=? WHERE id=?"
+    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `std`=?, `divi`=?, `bookName`=?, `currentDate`=?, `lastDate`=?  WHERE id=?"
 
 
     const values = [
