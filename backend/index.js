@@ -227,7 +227,8 @@ app.post("/studentdata", (req, res) => {
             console.error("Error inserting student:", err);
             return res.status(500).json({ message: "Database insert failed" });
         }
-        return res.json({ message: "Student added successfully!" });
+        // return res.json({ message: "Student added successfully!" });
+         return res.json({ success: true, data });
     });
 });
 
