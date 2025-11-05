@@ -148,7 +148,7 @@ function Tables() {
   const [student, setStudent] = useState({
     studentName: "",
     rollNo: "",
-    std: "",
+    standard: "",
     divi: "",
     bookName: "",
     currentDate: "",
@@ -282,7 +282,7 @@ function Tables() {
                     placeholder="STD (class)"
                     onChange={handlestudentdata}
                     name="std"
-                    value={student.std}
+                    value={student.standard}
                   />
                   <input
                     className="tables-input-child"

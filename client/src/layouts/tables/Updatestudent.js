@@ -94,7 +94,7 @@ function Updatestudent() {
     const [student, setStudent] = useState({
         studentName: "",
         rollNo: "",
-        std: "",
+        standard: "",
         divi: "",
         bookName: "",
         currentDate: "",
@@ -146,7 +146,7 @@ function Updatestudent() {
                         studentName: selectedBook.studentName,
                         bookName: selectedBook.bookName,
                         rollNo: selectedBook.rollNo,
-                        std: selectedBook.std,
+                        std: selectedBook.standard,
                         divi: selectedBook.divi,
                         status: selectedBook.status,
                         // currentDate: selectedBook.currentDate,

@@ -215,7 +215,6 @@ app.post("/studentdata", (req, res) => {
     const values = [
         req.body.studentName,
         req.body.rollNo,
-        req.body.std,
         req.body.divi, // we are reading "div" from frontend
         req.body.standard,
         req.body.bookName,
@@ -259,7 +258,6 @@ app.put("/studentdata/:id", (req, res) => {
     const values = [
         req.body.studentName,
         req.body.rollNo,
-        req.body.std,
         req.body.divi, // we are reading "div" from frontend
         req.body.standard,
         req.body.bookName,
