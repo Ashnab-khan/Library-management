@@ -199,7 +199,7 @@ function Dashboard() {
                 </div>
                 <div className="dashboard-NewBook-button">
                   <button>
-                    <Link to="/tables">Add New Book</Link>
+                    <Link to="/Addnewbook">Add New Book</Link>
                   </button>
                 </div>
               </div>

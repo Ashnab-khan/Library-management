@@ -169,9 +169,19 @@ function Tables() {
     }
   };
   // ---------------------------- Add Funcation
+  const [filteredBooks, setFilteredBooks] = useState([]);
 
   const handlestudentdata = (e) => {
+    const { name, value } = e.target;
     setStudent((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+    // 👇 When standard changes, filter books dynamically
+    if (name === "standard") {
+      const filtered = tableBooks.filter((book) => book.standard === value);
+      setFilteredBooks(filtered);
+      setStudent((prev) => ({ ...prev, standard: value, bookName: "" })); // reset bookName
+    }
+
   };
 
 
@@ -242,11 +252,17 @@ function Tables() {
                 />
               </MDBox>
             </Card> */}
-            <div className='form tables-form'>
+            {/* <div className='form tables-form'>
               <h3>Add New-Book</h3>
               <div className="tables-form-input">
                 <input className="tables-input-child" type="text" placeholder='title' onChange={handleChange} name='title' />
-                <input className="tables-input-child" type="text" placeholder='standard' onChange={handleChange} name='standard' />
+                <select className="tables-input-child" onChange={handleChange} name='standard'>
+                  <option value="">Select Standard</option>
+                  <option value="First" id="1">First</option>
+                  <option value="Second" id="2">Second</option>
+                  <option value="Third" id="3">Third</option>
+                  <option value="Fourth" id="4">Fourth</option>
+                </select>
                 <input className="tables-input-child" type="text" placeholder='desc' onChange={handleChange} name='desc' />
                 <input className="tables-input-child" type="number" placeholder='price' onChange={handleChange} name='price' />
                 <input className="tables-input-child" type="text" placeholder='cover' onChange={handleChange} name='cover' />
@@ -254,7 +270,7 @@ function Tables() {
               <div className="tables-form-btn">
                 <button className='formbutton' onClick={handleClick}>Added</button>
               </div>
-            </div>
+            </div> */}
 
             <div className='form Student-tables-form '>
               <h3>Add Student Data</h3>
@@ -279,19 +295,35 @@ function Tables() {
                   <input
                     className="tables-input-child"
                     type="text"
-                    placeholder="STD (class)"
-                    onChange={handlestudentdata}
-                    name="std"
-                    value={student.standard}
-                  />
-                  <input
-                    className="tables-input-child"
-                    type="text"
                     placeholder="Div (A, B, C...)"
                     onChange={handlestudentdata}
                     name="divi"
                     value={student.divi}
                   />
+
+                  {/* <input
+                    className="tables-input-child"
+                    type="text"
+                    placeholder="STD (class)"
+                    onChange={handlestudentdata}
+                    name="std"
+                    value={student.standard}
+                  /> */}
+
+                  {/* ✅ Standard Dropdown */}
+                  <select
+                    className="tables-input-child"
+                    name="standard"
+                    onChange={handlestudentdata}
+                    value={student.standard}
+                  >
+                    <option value="">Select Standard</option>
+                    <option value="First">First</option>
+                    <option value="Second">Second</option>
+                    <option value="Third">Third</option>
+                    <option value="Fourth">Fourth</option>
+                    {/* <option value="Fourth">Fifth</option> */}
+                  </select>
                 </div>
 
                 <div className="Student-form-input">
@@ -301,13 +333,24 @@ function Tables() {
                     name="bookName"
                     onChange={handlestudentdata}
                     value={student.bookName}
+                    disabled={!student.standard}
                   >
-                    <option value="">Select Book</option>
+                    {/* <option value="">Select Book</option>
                     {tableBooks.map((book) => (
                       <option key={book.id} value={book.title}>
                         {book.title}
                       </option>
-                    ))}
+                    ))} */}
+                    <option value="">Select Book</option>
+                    {filteredBooks.length > 0 ? (
+                      filteredBooks.map((book) => (
+                        <option key={book.id} value={book.title}>
+                          {book.title}
+                        </option>
+                      ))
+                    ) : (
+                      student.standard && <option>No books found for this standard</option>
+                    )}
                   </select>
 
                   <input
@@ -376,54 +419,64 @@ function Tables() {
                   </tr>
                 </thead>
                 <tbody>
-                  {studentdata.length > 0 ? (
-                    studentdata.map((emp) => (
-                      <tr key={emp.id}>
-                        <td>
-                          <div className="d-flex align-items-center prof-img-name">
-                            <div>
-                              <div className="fw-bold">{emp.studentName}</div>
-                              <div className="text-muted small">{emp.bookName}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="fw-semibold">{emp.std}</div>
-                          <div className="text-muted small func-small">{emp.divi}</div>
-                        </td>
-                        <td>
-                          <span>{emp.rollNo}</span>
-                        </td>
+                  {studentdata.length > 0 ?
+                    //  (
+                    //   studentdata.map((emp) => (
+                    (
+                      [...studentdata]
+                        .sort((a, b) => {
+                          // Pending should come before Received
+                          if (a.status === "Pending" && b.status === "Received") return -1;
+                          if (a.status === "Received" && b.status === "Pending") return 1;
+                          return 0;
+                        })
+                        .map((emp) => (
+                          <tr key={emp.id}>
+                            <td>
+                              <div className="d-flex align-items-center prof-img-name">
+                                <div>
+                                  <div className="fw-bold">{emp.studentName}</div>
+                                  <div className="text-muted small">{emp.bookName}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="fw-semibold">{emp.standard}</div>
+                              <div className="text-muted small func-small">{emp.divi}</div>
+                            </td>
+                            <td>
+                              <span>{emp.rollNo}</span>
+                            </td>
 
-                        {/* STATUS DROPDOWN */}
+                            {/* STATUS DROPDOWN */}
 
-                        <td className="text-muted"
-                          style={{
-                            color: emp.status === "Pending" ? "blue" : emp.status === "Received" ? "red" : "black"
-                          }}
+                            <td className="text-muted"
+                              style={{
+                                color: emp.status === "Pending" ? "red" : emp.status === "Received" ? "Blue" : "black"
+                              }}
 
-                        >{emp.status}</td>
+                            >{emp.status}</td>
 
-                        {/* <td className="text-muted">{emp.lastDate}</td> */}
-                        <td className="text-muted">{emp.lastDate ? emp.lastDate.split("T")[0] : ""}</td>
-                        <td>
-                          <button className="btn btn-link text-decoration-none"><Link to={`/Updatestudent/${emp.id}`}>Update</Link></button>
-                          <button
-                            className="btn btn-link text-decoration-none"
-                            onClick={() => handleDeletestudent(emp.id)}
-                          >
-                            Delete
-                          </button>
+                            {/* <td className="text-muted">{emp.lastDate}</td> */}
+                            <td className="text-muted">{emp.lastDate ? emp.lastDate.split("T")[0] : ""}</td>
+                            <td>
+                              <button className="btn btn-link text-decoration-none"><Link to={`/Updatestudent/${emp.id}`}>Update</Link></button>
+                              <button
+                                className="btn btn-link text-decoration-none"
+                                onClick={() => handleDeletestudent(emp.id)}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                    ) : (
+                      <tr>
+                        <td className="text-center text-muted">
+                          No student data found.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td className="text-center text-muted">
-                        No student data found.
-                      </td>
-                    </tr>
-                  )}
+                    )}
                 </tbody>
               </table>
             </div>

@@ -48,6 +48,7 @@ import SignUp from "layouts/authentication/sign-up";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import Updatestudent from "layouts/tables/Updatestudent";
+import Addnewbook from "layouts/tables/Addnewbook";
 
 const routes = [
   {
@@ -73,6 +74,14 @@ const routes = [
     icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/billing/:id",
     component: <Billing />,
+  },
+    {
+    type: "collapse",
+    name: "Updatestudent",
+    key: "Updatestudent",
+    icon: <Icon fontSize="small">receipt_long</Icon>,
+    route: "/Addnewbook",
+    component: <Addnewbook/>,
   },
   {
     type: "collapse",
