@@ -39,6 +39,8 @@ import "../billing/billing.css"
 function Billing() {
   const [bookLibrary, setBookLibrary] = useState({
     title: "",
+    standard: "",
+    quantity:0,
     description: "",
     price: "",
     cover: ""
@@ -56,7 +58,7 @@ function Billing() {
     setBookLibrary(prev => ({ ...prev, [e.target.name]: e.target.value }))
   };
 
-  console.log("checking Previous value" ,bookLibrary );
+  console.log("checking Previous value", bookLibrary);
 
 
   // ---------------------------------------
@@ -70,6 +72,8 @@ function Billing() {
         if (selectedBook) {
           setBookLibrary({
             title: selectedBook.title,
+            standard: selectedBook.standard,
+            quantity: selectedBook.quantity,
             description: selectedBook.description,
             price: selectedBook.price,
             cover: selectedBook.cover,
@@ -139,13 +143,36 @@ function Billing() {
               <div className="billing-form-input">
                 <input className="billing-input-child" type="text" placeholder='title'
                   value={bookLibrary.title} onChange={handleChange} name='title' />
+
+                <select className="tables-input-child" value={bookLibrary.standard} onChange={handleChange} name='standard'>
+                  <option value="">Select Standard</option>
+                  <option value="First" id="1">First</option>
+                  <option value="Second" id="2">Second</option>
+                  <option value="Third" id="3">Third</option>
+                  <option value="Fourth" id="4">Fourth</option>
+                </select>
+
+                {/* Quantity with +/- */}
+                <input
+                  className="tables-input-child"
+                  type="number"
+                  placeholder="quantity"
+                  value={bookLibrary.quantity}
+                  onChange={handleChange}
+                  name="quantity"
+                  min="0"
+                />
                 <input className="billing-input-child" type="text" placeholder='description'
                   value={bookLibrary.description} onChange={handleChange} name='description' />
+              </div>
+
+              <div className="table-form-inputto">
                 <input className="billing-input-child" type="number" placeholder='price'
                   value={bookLibrary.price} onChange={handleChange} name='price' />
                 <input className="billing-input-child" type="text" placeholder='cover'
                   value={bookLibrary.cover} onChange={handleChange} name='cover' />
               </div>
+
               <div className="billing-form-btn">
                 <button className='formbutton' onClick={handleClick}>Update</button>
               </div>
@@ -160,7 +187,7 @@ function Billing() {
         </MDBox>
       </MDBox>
       <Footer />
-    </DashboardLayout>
+    </DashboardLayout >
   );
 }
 

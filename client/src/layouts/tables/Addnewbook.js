@@ -120,7 +120,7 @@ function Addnewbook() {
                                     min="0"
                                 />
 
-                                <input className="tables-input-child" type="text" placeholder='desc' onChange={handleChange} name='desc' />
+                                <input className="tables-input-child" type="text" placeholder='description' onChange={handleChange} name='description' />
 
                             </div>
 
