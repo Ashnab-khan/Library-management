@@ -119,7 +119,7 @@ function Updatestudent() {
                         studentName: selectedBook.studentName,
                         bookName: selectedBook.bookName,
                         rollNo: selectedBook.rollNo,
-                        std: selectedBook.standard,
+                        standard: selectedBook.standard,
                         divi: selectedBook.divi,
                         status: selectedBook.status,
                         // currentDate: selectedBook.currentDate,
@@ -193,7 +193,7 @@ function Updatestudent() {
                                         placeholder="STD (class)"
                                         onChange={handlestudentdata}
                                         name="std"
-                                        value={student.std}
+                                        value={student.standard}
                                     />
                                     <input
                                         className="tables-input-child"
