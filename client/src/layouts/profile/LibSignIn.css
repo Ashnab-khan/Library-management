@@ -3,8 +3,6 @@
     justify-content: center;
  }
  
- 
- 
  .login-container {
       background: #2b2b3c;
       padding: 40px;
@@ -17,7 +15,7 @@
       margin-bottom: 20px;
       color: #ffcb3b;
     }
-    input {
+  .login-container  input {
       width: 90%;
       padding: 10px;
       margin: 8px 0;
@@ -26,7 +24,7 @@
       background-color: #3a3a4d;
       color: white;
     }
-    button {
+  .login-container  button {
       width: 95%;
       padding: 10px;
       margin-top: 15px;
@@ -37,14 +35,14 @@
       font-weight: bold;
       cursor: pointer;
     }
-    button:hover {
+  .login-container  button:hover {
       background-color: #f1c232;
     }
-    .links {
+  .login-container  .links {
       margin-top: 10px;
       font-size: 14px;
     }
-    .links a {
+  .login-container  .links a {
       color: #ffcb3b;
       text-decoration: none;
     }

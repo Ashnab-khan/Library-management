@@ -52,6 +52,7 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 // Images
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
+import LibSignIn from "layouts/profile/LibSignIn";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -190,6 +191,7 @@ export default function App() {
       )}
       {layout === "vr" && <Configurator />}
       <Routes>
+         <Route path="/libsignin" element={<LibSignIn />} />   {/* ✅ Login page */}
         {getRoutes(routes)}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>

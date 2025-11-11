@@ -180,6 +180,23 @@ app.get("/signinlibrary", (req, res) => {
 // Library Login
 // ----------------------------------------------------------
 
+// ----------------------------------------------------------
+// LOGOUT Login
+// ----------------------------------------------------------
+// ✅ LOGOUT (Sign Out)
+app.post("/signoutlibrary", (req, res) => {
+  // In a real system, you'd clear session or token here
+  console.log("✅ User logged out.");
+  return res.json({
+    success: true,
+    message: "Logout successful!",
+    redirectUrl: "http://localhost:3000/LibSignIn",
+  });
+});
+// ----------------------------------------------------------
+// LOGOUT Login
+// ----------------------------------------------------------
+
 
 // ----------------------------------------------------------
 // librarybooks
