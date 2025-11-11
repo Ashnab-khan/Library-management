@@ -184,6 +184,8 @@ app.get("/signinlibrary", (req, res) => {
 // LOGOUT Login
 // ----------------------------------------------------------
 // ✅ LOGOUT (Sign Out)
+// Logout koi database entry nahi karta.
+// Woh sirf ek signal hota hai “User ne session end kar diya”.
 app.post("/signoutlibrary", (req, res) => {
   // In a real system, you'd clear session or token here
   console.log("✅ User logged out.");
@@ -196,6 +198,44 @@ app.post("/signoutlibrary", (req, res) => {
 // ----------------------------------------------------------
 // LOGOUT Login
 // ----------------------------------------------------------
+
+
+// ✅ CHANGE PASSWORD
+app.put("/changepasswordlibrary", (req, res) => {
+  const { username, oldPassword, newPassword } = req.body;
+
+  if (!username || !oldPassword || !newPassword) {
+    return res.status(400).json({ message: "All fields are required!" });
+  }
+
+  // Check if old password is correct
+  const checkQuery = "SELECT * FROM signinlibrary WHERE username = ? AND password = ?";
+  db.query(checkQuery, [username, oldPassword], (err, results) => {
+    if (err) {
+      console.error("❌ DB Error:", err);
+      return res.status(500).json({ message: "Database error!" });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ message: "Old password is incorrect!" });
+    }
+
+    // Update password
+    const updateQuery = "UPDATE signinlibrary SET password = ? WHERE username = ?";
+    db.query(updateQuery, [newPassword, username], (err2) => {
+      if (err2) {
+        console.error("❌ Update Error:", err2);
+        return res.status(500).json({ message: "Could not update password!" });
+      }
+
+      return res.json({
+        success: true,
+        message: "Password updated successfully!",
+      });
+    });
+  });
+});
+
 
 
 // ----------------------------------------------------------

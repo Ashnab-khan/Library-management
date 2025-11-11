@@ -60,7 +60,7 @@ function LibSignIn() {
                                 <button type="submit">Sign In</button>
                             </form>
                             <div className="links">
-                                <a href="/forgetpassword">Forgot Password?</a>
+                                <a href="/LibChangePassword">Forgot Password?</a>
                             </div>
                         </div>
                     </Grid>

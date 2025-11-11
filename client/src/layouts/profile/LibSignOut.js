@@ -33,19 +33,25 @@ function LogoutButton() {
             <MDBox pt={6} pb={3}>
                 <Grid container spacing={6}>
                     <Grid className="login-Section" item xs={12}>
-                        <button
-                            onClick={handleLogout}
-                            style={{
-                                backgroundColor: "#d9534f",
-                                color: "#fff",
-                                border: "none",
-                                padding: "10px 20px",
-                                borderRadius: "6px",
-                                cursor: "pointer",
-                            }}
-                        >
-                            Logout
-                        </button>
+                        <div className="login-container">
+                            <h2>Library Log-Out</h2>
+                            <button
+                                onClick={handleLogout}
+                                style={{
+                                    backgroundColor: "#d9534f",
+                                    color: "#fff",
+                                    border: "none",
+                                    padding: "10px 20px",
+                                    borderRadius: "6px",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                Logout
+                            </button>
+                            <div className="links">
+                                <a href="/LibChangePassword">Forgot Password?</a>
+                            </div>
+                        </div>
                     </Grid>
                 </Grid>
             </MDBox>

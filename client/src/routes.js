@@ -51,6 +51,7 @@ import Updatestudent from "layouts/tables/Updatestudent";
 import Addnewbook from "layouts/tables/Addnewbook";
 import LibSignIn from "layouts/profile/LibSignIn";
 import LibSignOut from "layouts/profile/LibSignOut";
+import LibChangePassword from "layouts/profile/LibChangePassword";
 
 const routes = [
   {
@@ -69,13 +70,13 @@ const routes = [
     route: "/tables",
     component: <Tables />,
   },
-      {
+  {
     type: "collapse",
     name: "Add New-Book",
     key: "Add New-Book",
     icon: <Icon fontSize="small">Add</Icon>,
     route: "/Addnewbook",
-    component: <Addnewbook/>,
+    component: <Addnewbook />,
   },
 
   {
@@ -92,7 +93,7 @@ const routes = [
     key: "Updatestudent",
     icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/Updatestudent/:id",
-    component: <Updatestudent/>,
+    component: <Updatestudent />,
   },
   {
     type: "collapse",
@@ -126,13 +127,21 @@ const routes = [
     route: "/LibSignIn",
     component: <LibSignIn />,
   },
-    {
+  {
     type: "collapse",
     name: "Log Out",
     key: "sign-out",
     icon: <Icon fontSize="small">Log Out</Icon>,
     route: "/LibSignOut",
     component: <LibSignOut />,
+  },
+  {
+    type: "collapse",
+    name: "Change Password",
+    key: "Change Password",
+    icon: <Icon fontSize="small">LibChangePassword</Icon>,
+    route: "/LibChangePassword",
+    component: <LibChangePassword />,
   },
   {
     type: "collapse",
