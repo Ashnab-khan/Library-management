@@ -311,21 +311,29 @@ app.delete("/librarybooks/:id", (req, res) => {
 })
 //--------------- delete condition ---------------
 
-// Increment quantity by 1
+// ✅ Increment quantity by any given number
 app.post("/librarybooks/:id/increment", (req, res) => {
-    const bookId = req.params.id;
-    const q = "UPDATE librarybooks SET quantity = quantity + 1 WHERE id = ?";
-    db.query(q, [bookId], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json({ success: true, message: "quantity incremented" });
-    });
+  const bookId = req.params.id;
+  const { quantity } = req.body; // frontend sends how many to add
+
+  // Basic validation
+  if (!quantity || quantity <= 0) {
+    return res.status(400).json({ success: false, message: "Invalid quantity" });
+  }
+
+  const q = "UPDATE librarybooks SET quantity = quantity + ? WHERE id = ?";
+  db.query(q, [quantity, bookId], (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.json({ success: true, message: `Quantity incremented by ${quantity}` });
+  });
 });
+
 
 // Decrement quantity by 1 (not below 0)
 // ✅ New version - decrement by requested quantity
 app.post("/librarybooks/:id/decrement", (req, res) => {
   const bookId = req.params.id;
-  const { quantity } = req.body; // 👈 frontend sends the quantity (e.g., 3, 4, 6)
+  const { quantity } = req.body; // frontend sends the quantity (e.g., 3, 4, 6)
   
   if (!quantity || quantity <= 0) {
     return res.status(400).json({ success: false, message: "Invalid quantity" });
@@ -424,7 +432,7 @@ app.put("/studentdata/:id", (req, res) => {
     // this params represent /books
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `std`=?, `divi`=?, `standard=?`, `bookName`=?, quantity=?, `currentDate`=?, `lastDate`=? , `status`=?  WHERE id=?"
+    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `std`=?, `divi`=?, `standard`=?, `bookName`=?, quantity=?, `currentDate`=?, `lastDate`=? , `status`=?  WHERE id=?"
 
 
     const values = [

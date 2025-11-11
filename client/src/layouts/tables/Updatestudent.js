@@ -90,7 +90,7 @@ function Updatestudent() {
             // navigate("/tables")
             // ✅ force reload after navigate
             // navigate("/tables", { state: { updated: true } });
-            window.location.reload();
+            // window.location.reload();
         } catch (err) {
             console.error("Error adding student:", err);
             alert("❌ Failed to add student");
@@ -221,15 +221,6 @@ function Updatestudent() {
                                         ))}
                                     </select>
 
-                                    <input
-                                        className="tables-input-child"
-                                        type="date"
-                                        placeholder="Current Date"
-                                        onChange={handlestudentdata}
-                                        name="currentDate"
-                                        value={student.currentDate}
-                                    />
-
                                     <select
                                         className="tables-input-child"
                                         name="status"
@@ -239,6 +230,15 @@ function Updatestudent() {
                                         <option value="Pending">Pending</option>
                                         <option value="Received">Received</option>
                                     </select>
+
+                                    <input
+                                        className="tables-input-child"
+                                        type="date"
+                                        placeholder="Current Date"
+                                        onChange={handlestudentdata}
+                                        name="currentDate"
+                                        value={student.currentDate}
+                                    />
 
 
                                     <input
