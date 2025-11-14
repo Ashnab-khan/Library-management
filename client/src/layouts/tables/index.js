@@ -222,6 +222,7 @@ function Tables() {
       });
 
       alert("✅ Student added successfully!");
+      window.location.reload()
     } catch (err) {
       console.error("Error adding student:", err);
       alert("❌ Failed to add student");

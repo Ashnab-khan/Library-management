@@ -143,6 +143,33 @@ function Billing() {
   //   }
   // }
 
+  // const handleClick = async (e) => {
+  //   e.preventDefault();
+
+  //   const formData = new FormData();
+  //   formData.append("title", bookLibrary.title);
+  //   formData.append("standard", bookLibrary.standard);
+  //   formData.append("description", bookLibrary.description);
+  //   formData.append("price", bookLibrary.price);
+  //   formData.append("quantity", bookLibrary.quantity);
+
+  //   if (newCoverFile) {
+  //     formData.append("cover", newCoverFile);
+  //   } else {
+  //     formData.append("cover", bookLibrary.cover); // keep old image
+  //   }
+
+  //   try {
+  //     await axios.put(`${BASE_URL}/librarybooks/${bookId}`, formData, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
+  //     navigate("/dashboard");
+  //   } catch (err) {
+  //     console.error("Update error:", err);
+  //   }
+  // };
+
+
   const handleClick = async (e) => {
     e.preventDefault();
 
@@ -153,10 +180,9 @@ function Billing() {
     formData.append("price", bookLibrary.price);
     formData.append("quantity", bookLibrary.quantity);
 
+    // Only append file if user selected new one
     if (newCoverFile) {
       formData.append("cover", newCoverFile);
-    } else {
-      formData.append("cover", bookLibrary.cover); // keep old image
     }
 
     try {
@@ -168,6 +194,7 @@ function Billing() {
       console.error("Update error:", err);
     }
   };
+
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
@@ -206,7 +233,7 @@ function Billing() {
           </Grid>
         </MDBox>   */}
         <MDBox mb={3}>
-          <Grid xs={12} spacing={3}>
+          <Grid xs={12} spacing={6}>
             <div className='form billing-form'>
               <h3>Update The Book</h3>
               <div className="billing-form-input">

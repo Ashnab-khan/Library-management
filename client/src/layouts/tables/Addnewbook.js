@@ -109,30 +109,61 @@ function Addnewbook() {
     //     }
     // }
 
+    // const handleClick = async (e) => {
+    //     e.preventDefault();
+
+    //     // Build FormData
+    //     const formData = new FormData();
+    //     formData.append("title", book.title);
+    //     formData.append("standard", book.standard);
+    //     formData.append("description", book.description);
+    //     formData.append("price", book.price === "" ? null : book.price);
+    //     formData.append("quantity", book.quantity || 0);
+
+    //     if (coverFile) {
+    //         formData.append("cover", coverFile); // key 'cover' matches upload.single("cover")
+    //     }
+
+    //     try {
+    //         await axios.post(`${BASE_URL}/librarybooks`, formData, {
+    //             headers: { "Content-Type": "multipart/form-data" },
+    //         });
+    //         navigate("/dashboard");
+    //     } catch (err) {
+    //         console.log("Upload error:", err);
+    //     }
+    // };
+
+
     const handleClick = async (e) => {
         e.preventDefault();
 
-        // Build FormData
         const formData = new FormData();
         formData.append("title", book.title);
         formData.append("standard", book.standard);
-        formData.append("description", book.description);
-        formData.append("price", book.price === "" ? null : book.price);
-        formData.append("quantity", book.quantity || 0);
-
-        if (coverFile) {
-            formData.append("cover", coverFile); // key 'cover' matches upload.single("cover")
-        }
+        formData.append("description", book.description); // desc nahi, backend "description" expect karta hai
+        formData.append("price", book.price);
+        formData.append("quantity", book.quantity);
+        formData.append("cover", book.cover); // FILE 
 
         try {
-            await axios.post(`${BASE_URL}/librarybooks`, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            navigate("/dashboard");
+            const res = await axios.post(
+                "https://library-management-s4mr.onrender.com/librarybooks",
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" }
+                }
+            );
+
+            console.log("Success:", res.data);
+            alert("Book Added Successfully");
+
         } catch (err) {
-            console.log("Upload error:", err);
+            console.error("Error:", err);
+            alert("Failed to add book");
         }
     };
+
 
     // -------------------------------------------------------------------
     // -------------------------------------------------------------------
@@ -176,7 +207,15 @@ function Addnewbook() {
                                 {/* <input className="tables-input-child" type="text" placeholder='cover' onChange={handleChange} name='cover' /> */}
 
                                 {/* file input */}
-                                <input type="file" accept="image/*" onChange={handleFileChange} />
+                                {/* <input type="file" accept="image/*" onChange={handleFileChange} /> */}
+                                <input
+                                    // className="tables-input-child"
+                                    type="file"
+                                    name="cover"
+                                    onChange={(e) => setBook(prev => ({ ...prev, cover: e.target.files[0] }))}
+                                    accept="image/*"
+                                />
+
 
                                 {/* preview (optional) */}
                                 {previewUrl && (

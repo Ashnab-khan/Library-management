@@ -6,13 +6,18 @@ import mysql from "mysql2";
 import dotenv from "dotenv";
 
 
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
+// import multer from "multer";
+// import path from "path";
+// import fs from "fs";
+// import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+
 
 dotenv.config(); // Load .env variables
 
@@ -307,32 +312,42 @@ app.put("/changepasswordlibrary", (req, res) => {
 
 // Make sure 'uploads' folder exists in the same dir as this file
 // Serve uploaded files statically at /uploads
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
-const uploadDir = path.join(__dirname, "uploads");
+// const uploadDir = path.join(__dirname, "uploads");
 
-// ✅ Ensure uploads folder exists (important for Render)
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+// // ✅ Ensure uploads folder exists (important for Render)
+// if (!fs.existsSync(uploadDir)) {
+//     fs.mkdirSync(uploadDir, { recursive: true });
+// }
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir); // upload destination
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + file.originalname;
-        cb(null, uniqueSuffix);
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, uploadDir); // upload destination
+//     },
+//     filename: (req, file, cb) => {
+//         const uniqueSuffix = Date.now() + "-" + file.originalname;
+//         cb(null, uniqueSuffix);
+//     },
+// });
+
+// const upload = multer({ storage });
+
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: "library", // Folder name in Cloudinary
+        allowed_formats: ["jpg", "jpeg", "png"],
     },
 });
 
 const upload = multer({ storage });
 
 
+
 app.post("/librarybooks", upload.single("cover"), (req, res) => {
-    const file = req.file;
-    const coverPath = file ? `uploads/${file.filename}` : null;
+    const coverPath = req.file ? req.file.path : null;  // Cloudinary URL aata hai
 
     const { title, standard, description, price, quantity } = req.body;
 
@@ -352,15 +367,25 @@ app.post("/librarybooks", upload.single("cover"), (req, res) => {
     });
 });
 
+
 // --------------------------------------------
 
+// app.get("/librarybooks", (req, res) => {
+//     const q = "SELECT * FROM librarybooks"
+//     db.query(q, (err, data) => {
+//         if (err) return res.json(err)
+//         return res.json(data)
+//     })
+// })
+
 app.get("/librarybooks", (req, res) => {
-    const q = "SELECT * FROM librarybooks"
+    const q = "SELECT * FROM librarybooks";
     db.query(q, (err, data) => {
-        if (err) return res.json(err)
-        return res.json(data)
-    })
-})
+        if (err) return res.json(err);
+        res.json(data);
+    });
+});
+
 
 //--------------- Update condition ---------------
 // app.put("/librarybooks/:id", (req, res) => {
@@ -390,13 +415,15 @@ app.get("/librarybooks", (req, res) => {
 app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
     const bookId = req.params.id;
 
-    // If a new file is uploaded, use its path. Otherwise keep existing cover.
-    let coverPath = req.file
-        ? `/uploads/${req.file.filename}`
-        : req.body.cover;
+    // If new image uploaded → use Cloudinary URL
+    // else → keep old image
+    const coverPath = req.file ? req.file.path : req.body.cover;
 
-    const q =
-        "UPDATE librarybooks SET `title`=?, `standard`=?, `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?";
+    const q = `
+    UPDATE librarybooks 
+    SET title=?, standard=?, description=?, price=?, cover=?, quantity=? 
+    WHERE id=?
+  `;
 
     const values = [
         req.body.title,
@@ -405,9 +432,10 @@ app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
         req.body.price,
         coverPath,
         req.body.quantity || 0,
+        bookId,
     ];
 
-    db.query(q, [...values, bookId], (err, data) => {
+    db.query(q, values, (err, data) => {
         if (err) {
             console.log("SQL Update Error:", err);
             return res.status(500).json({ error: "Update failed", details: err });
@@ -415,6 +443,7 @@ app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
         res.json({ message: "Book updated successfully" });
     });
 });
+
 //--------------- Update condition ---------------
 
 

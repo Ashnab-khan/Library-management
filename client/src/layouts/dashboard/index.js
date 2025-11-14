@@ -141,51 +141,13 @@ function Dashboard() {
         </Grid>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
-            {/* <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsBarChart
-                  color="info"
-                  title="website views"
-                  description="Last Campaign Performance"
-                  date="campaign sent 2 days ago"
-                  chart={reportsBarChartData}
-                />
-              </MDBox>
-            </Grid> */}
-            {/* <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="success"
-                  title="daily sales"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today sales.
-                    </>
-                  }
-                  date="updated 4 min ago"
-                  chart={sales}
-                />
-              </MDBox>
-            </Grid> */}
-            {/* <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="dark"
-                  title="completed tasks"
-                  description="Last Campaign Performance"
-                  date="just updated"
-                  chart={tasks}
-                />
-              </MDBox>
-            </Grid> */}
-
             <Grid item xs={12} md={12} lg={12}>
               <div className="main-dashboard">
                 <div className="dashboard-books" >
                   {books.map((book) => (
                     <div className="dashboard-book-child" key={book.id}>
                       {/* {book.cover && <img src={book.cover} alt='' />} */}
-                      {book.cover && (
+                      {/* {book.cover && (
                         <img
                           // src={`https://library-management-s4mr.onrender.com/${book.cover}`}
                             src={`https://library-management-s4mr.onrender.com${book.cover.startsWith("/") ? book.cover : "/" + book.cover}`}
@@ -198,7 +160,9 @@ function Dashboard() {
                             marginBottom: "10px"
                           }}
                         />
-                      )}
+                      )} */}
+                      <img src={book.cover} alt="cover" width="40" />
+
                       <h2>Book Name: {book.title}</h2>
                       <h4>Std: {book.standard}</h4>
                       <p>{book.description}</p>
