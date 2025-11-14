@@ -141,10 +141,14 @@ function Addnewbook() {
         const formData = new FormData();
         formData.append("title", book.title);
         formData.append("standard", book.standard);
-        formData.append("description", book.description); // desc nahi, backend "description" expect karta hai
+        formData.append("description", book.description);
         formData.append("price", book.price);
         formData.append("quantity", book.quantity);
-        formData.append("cover", book.cover); // FILE 
+
+        // ❗Correct: Always use the actual file, not book.cover
+        if (coverFile) {
+            formData.append("cover", coverFile);
+        }
 
         try {
             const res = await axios.post(
@@ -157,12 +161,12 @@ function Addnewbook() {
 
             console.log("Success:", res.data);
             alert("Book Added Successfully");
-
         } catch (err) {
             console.error("Error:", err);
             alert("Failed to add book");
         }
     };
+
 
 
     // -------------------------------------------------------------------
@@ -209,13 +213,17 @@ function Addnewbook() {
                                 {/* file input */}
                                 {/* <input type="file" accept="image/*" onChange={handleFileChange} /> */}
                                 <input
-                                    // className="tables-input-child"
                                     type="file"
                                     name="cover"
-                                    onChange={(e) => setBook(prev => ({ ...prev, cover: e.target.files[0] }))}
                                     accept="image/*"
-                                />
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        setCoverFile(file);  // ✔ Use this
+                                        setBook(prev => ({ ...prev, cover: file })); // optional but ok
 
+                                        if (file) setPreviewUrl(URL.createObjectURL(file));
+                                    }}
+                                />
 
                                 {/* preview (optional) */}
                                 {previewUrl && (

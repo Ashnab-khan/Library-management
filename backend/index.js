@@ -18,6 +18,13 @@ import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 
+// Add Cloudinary config here 👇
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 
 dotenv.config(); // Load .env variables
 
@@ -347,25 +354,38 @@ const upload = multer({ storage });
 
 
 app.post("/librarybooks", upload.single("cover"), (req, res) => {
-    const coverPath = req.file ? req.file.path : null;  // Cloudinary URL aata hai
+    try {
+        const coverUrl = req.file ? req.file.path : null;  // Cloudinary URL
 
-    const { title, standard, description, price, quantity } = req.body;
+        const q = `
+            INSERT INTO librarybooks 
+            (title, standard, description, price, cover, quantity)
+            VALUES (?)
+        `;
 
-    const q = `
-    INSERT INTO librarybooks (title, standard, description, price, cover, quantity)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `;
+        const values = [
+            req.body.title || null,
+            req.body.standard || null,
+            req.body.description || null,
+            req.body.price || null,
+            coverUrl,
+            req.body.quantity || 0
+        ];
 
-    const values = [title, standard, description, price, coverPath, quantity];
+        db.query(q, [values], (err, data) => {
+            if (err) {
+                console.error("SQL ERROR:", err);
+                return res.status(500).json({ message: "DB insert failed", error: err });
+            }
+            return res.json({ success: true, data });
+        });
 
-    db.query(q, values, (err, data) => {
-        if (err) {
-            console.error("SQL Insert Error:", err);
-            return res.status(500).json({ message: "Database Insert Failed", error: err });
-        }
-        res.json({ success: true, message: "Book added successfully!" });
-    });
+    } catch (error) {
+        console.error("SERVER ERROR:", error);
+        return res.status(500).json({ message: "Server error", error });
+    }
 });
+
 
 
 // --------------------------------------------
