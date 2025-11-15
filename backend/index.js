@@ -20,9 +20,9 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 // Add Cloudinary config here 👇
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 
@@ -545,43 +545,91 @@ app.get("/librarybooks/:id/decrement", (req, res) => {
 // ------------------------------------------------------------------
 // studentdata
 // ------------------------------------------------------------------
-app.post("/studentdata", (req, res) => {
-    // const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `divi`, `standard`, `quantity` , `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
+// app.post("/studentdata", (req, res) => {
+//     // const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `divi`, `standard`, `quantity` , `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
 
+//     const q = `
+//     INSERT INTO studentdata 
+//     (\`studentName\`, \`rollNo\`, \`divi\`, \`standard\`, \`bookName\`, \`quantity\`, \`currentDate\`, \`lastDate\`, \`status\`) 
+//     VALUES (?)
+//   `;
+
+//     // Convert ISO date strings (from frontend) to YYYY-MM-DD
+//     const formatDate = (dateStr) => {
+//         if (!dateStr) return null;
+//         return dateStr.split("T")[0]; // "2025-11-04T00:00:00.000Z" → "2025-11-04"
+//     };
+
+//     const values = [
+//         req.body.studentName,
+//         req.body.rollNo,
+//         req.body.divi, // we are reading "div" from frontend
+//         req.body.standard,
+//         req.body.bookName,
+//         //  req.body.quantity || 1,
+//         Number(req.body.quantity),
+//         // req.body.currentDate,
+//         // req.body.lastDate,
+//         formatDate(req.body.currentDate),
+//         formatDate(req.body.lastDate),
+//         req.body.status || "Pending", // <-- Default to 'Pending'
+//     ];
+
+//     db.query(q, [values], (err, data) => {
+//         if (err) {
+//             console.error("Error inserting student:", err);
+//             return res.status(500).json({ message: "Database insert failed" });
+//         }
+//         // return res.json({ message: "Student added successfully!" });
+//         return res.json({ success: true, data });
+//     });
+// });
+
+
+// POST: create student with 3 books
+app.post("/studentdata", (req, res) => {
     const q = `
-    INSERT INTO studentdata 
-    (\`studentName\`, \`rollNo\`, \`divi\`, \`standard\`, \`bookName\`, \`quantity\`, \`currentDate\`, \`lastDate\`, \`status\`) 
+    INSERT INTO studentdata
+    (studentName, rollNo, divi, standard,
+     bookName, quantity,
+     bookName2, quantity2,
+     bookName3, quantity3,
+     currentDate, lastDate, status)
     VALUES (?)
   `;
 
-    // Convert ISO date strings (from frontend) to YYYY-MM-DD
-    const formatDate = (dateStr) => {
-        if (!dateStr) return null;
-        return dateStr.split("T")[0]; // "2025-11-04T00:00:00.000Z" → "2025-11-04"
-    };
+    const formatDate = (d) => (d ? d.split("T")[0] : null);
 
     const values = [
-        req.body.studentName,
-        req.body.rollNo,
-        req.body.divi, // we are reading "div" from frontend
-        req.body.standard,
-        req.body.bookName,
-        //  req.body.quantity || 1,
-        Number(req.body.quantity),
-        // req.body.currentDate,
-        // req.body.lastDate,
+        req.body.studentName || null,
+        req.body.rollNo || null,
+        req.body.divi || null,
+        req.body.standard || null,
+
+        // book 1
+        req.body.bookName || null,
+        Number(req.body.quantity) || 0,
+
+        // book 2
+        req.body.bookName2 || null,
+        Number(req.body.quantity2) || 0,
+
+        // book 3
+        req.body.bookName3 || null,
+        Number(req.body.quantity3) || 0,
+
         formatDate(req.body.currentDate),
         formatDate(req.body.lastDate),
-        req.body.status || "Pending", // <-- Default to 'Pending'
+        req.body.status || "Pending",
     ];
 
     db.query(q, [values], (err, data) => {
         if (err) {
-            console.error("Error inserting student:", err);
-            return res.status(500).json({ message: "Database insert failed" });
+            console.error("Insert error:", err);
+            return res.status(500).json({ error: err });
         }
-        // return res.json({ message: "Student added successfully!" });
-        return res.json({ success: true, data });
+
+        return res.json({ success: true, insertedId: data.insertId });
     });
 });
 
@@ -598,30 +646,78 @@ app.get("/studentdata", (req, res) => {
 
 
 //--------------- Update condition ---------------
-app.put("/studentdata/:id", (req, res) => {
-    // this params represent /books
-    const bookId = req.params.id;
-    // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `divi`=?, `standard`=?, `bookName`=?, quantity=?, `status`=? , `currentDate`=?, `lastDate`=?   WHERE id=?"
+// app.put("/studentdata/:id", (req, res) => {
+//     // this params represent /books
+//     const bookId = req.params.id;
+//     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
+//     const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `divi`=?, `standard`=?, `bookName`=?, quantity=?, `status`=? , `currentDate`=?, `lastDate`=?   WHERE id=?"
 
+
+//     const values = [
+//         req.body.studentName,
+//         req.body.rollNo,
+//         req.body.divi, // we are reading "div" from frontend
+//         req.body.standard,
+//         req.body.bookName,
+//         req.body.quantity,
+//         req.body.status, // Added
+//         req.body.currentDate,
+//         req.body.lastDate,
+//     ]
+
+//     db.query(q, [...values, bookId], (err, data) => {
+//         if (err) return res.json(err)
+//         return res.json("librarybooks has been Updated Succesfully")
+//     })
+// })
+
+app.put("/studentdata/:id", (req, res) => {
+    const id = req.params.id;
+
+    const q = `
+    UPDATE studentdata SET
+      studentName=?, rollNo=?, divi=?, standard=?,
+      bookName=?, quantity=?,
+      bookName2=?, quantity2=?,
+      bookName3=?, quantity3=?,
+      status=?, currentDate=?, lastDate=?
+    WHERE id=?
+  `;
+
+    const formatDate = (d) => (d ? d.split("T")[0] : null);
 
     const values = [
-        req.body.studentName,
-        req.body.rollNo,
-        req.body.divi, // we are reading "div" from frontend
-        req.body.standard,
-        req.body.bookName,
-        req.body.quantity,
-        req.body.status, // Added
-        req.body.currentDate,
-        req.body.lastDate,
-    ]
+        req.body.studentName || null,
+        req.body.rollNo || null,
+        req.body.divi || null,
+        req.body.standard || null,
 
-    db.query(q, [...values, bookId], (err, data) => {
-        if (err) return res.json(err)
-        return res.json("librarybooks has been Updated Succesfully")
-    })
-})
+        req.body.bookName || null,
+        Number(req.body.quantity) || 0,
+
+        req.body.bookName2 || null,
+        Number(req.body.quantity2) || 0,
+
+        req.body.bookName3 || null,
+        Number(req.body.quantity3) || 0,
+
+        req.body.status || "Pending",
+        formatDate(req.body.currentDate),
+        formatDate(req.body.lastDate),
+
+        id,
+    ];
+
+    db.query(q, values, (err, data) => {
+        if (err) {
+            console.error("Update error:", err);
+            return res.status(500).json(err);
+        }
+
+        return res.json({ success: true, message: "studentdata updated" });
+    });
+});
+
 //--------------- Update condition ---------------
 
 

@@ -145,17 +145,40 @@ function Tables() {
   // -------------------------------------------------------------------
   // -------------------------------------------------------------------
   // Add Student useState Condition 
+  // const [student, setStudent] = useState({
+  //   studentName: "",
+  //   rollNo: "",
+  //   standard: "",
+  //   divi: "",
+  //   bookName: "",
+  //   quantity: 1,
+  //   currentDate: "",
+  //   lastDate: "",
+  //   status: "", // Default status
+  // });
+
+
   const [student, setStudent] = useState({
     studentName: "",
     rollNo: "",
     standard: "",
     divi: "",
+
+    // Book slots
     bookName: "",
-    quantity: 1,
+    quantity: 0,
+
+    bookName2: "",
+    quantity2: 0,
+
+    bookName3: "",
+    quantity3: 0,
+
     currentDate: "",
     lastDate: "",
-    status: "", // Default status
+    status: "",
   });
+
   // ---------------------------- Add Funcation
   const [studentdata, setStudentdata] = useState([])
   // const handleAddStudent = async (e) => {
@@ -412,19 +435,13 @@ function Tables() {
 
                 <div className="Student-form-input">
                   {/* Dropdown for Book Name */}
-                  <select
+                  {/* <select
                     className="tables-input-child"
                     name="bookName"
                     onChange={handlestudentdata}
                     value={student.bookName}
                     disabled={!student.standard}
                   >
-                    {/* <option value="">Select Book</option>
-                    {tableBooks.map((book) => (
-                      <option key={book.id} value={book.title}>
-                        {book.title}
-                      </option>
-                    ))} */}
                     <option value="">Select Book</option>
                     {filteredBooks.length > 0 ? (
                       filteredBooks.map((book) => (
@@ -440,7 +457,6 @@ function Tables() {
                   {selectedBook && (
                     <div className="BooksCount-Input">
                       <p>Available:  {selectedBook ? bookCount : 0} </p>
-                      {/* Quantity input (disabled for now) */}
                       <input
                         type="number"
                         min="1"
@@ -452,7 +468,142 @@ function Tables() {
                         disabled={!selectedBook}
                       />
                     </div>
-                  )}
+                  )} */}
+
+
+                  <div className="multiple-books-section">
+                    {/* BOOK SLOT 1 */}
+                    <div className="Student-form-input">
+
+                      <select
+                        className="tables-input-child"
+                        name="bookName"
+                        value={student.bookName}
+                        onChange={handlestudentdata}
+                        disabled={!student.standard}
+                      >
+                        <option value="">Select Book</option>
+                        {filteredBooks.map((b) => (
+                          <option key={b.id} value={b.title}>{b.title}</option>
+                        ))}
+                      </select>
+
+                      {/* AVAILABLE COUNT SHOW */}
+                      {student.bookName && (
+                        <p style={{ margin: "5px 0", fontSize: "12px" }}>
+                          Available: {
+                            tableBooks.find(x => x.title === student.bookName)?.quantity || 0
+                          }
+                        </p>
+                      )}
+
+                      {/* QUANTITY INPUT */}
+                      <input
+                        type="number"
+                        min="0"
+                        max={
+                          (() => {
+                            const b = tableBooks.find(x => x.title === student.bookName);
+                            return b ? b.quantity : 1;
+                          })()
+                        }
+                        value={student.quantity}
+                        onChange={(e) => setStudent(prev => ({ ...prev, quantity: Number(e.target.value) }))}
+                        placeholder="Qty"
+                        className="tables-input-child"
+                        disabled={!student.bookName}
+                      />
+                    </div>
+
+
+
+                    {student.bookName && student.quantity > 0 && (
+                      <div className="Student-form-input">
+
+                        <select
+                          className="tables-input-child"
+                          name="bookName2"
+                          value={student.bookName2}
+                          onChange={handlestudentdata}
+                        >
+                          <option value="">Select Book (2)</option>
+                          {filteredBooks.map((b) => (
+                            <option key={b.id} value={b.title}>{b.title}</option>
+                          ))}
+                        </select>
+
+                        {/* AVAILABLE COUNT SHOW */}
+                        {student.bookName2 && (
+                          <p style={{ margin: "5px 0", fontSize: "12px" }}>
+                            Available: {
+                              tableBooks.find(x => x.title === student.bookName2)?.quantity || 0
+                            }
+                          </p>
+                        )}
+
+                        <input
+                          type="number"
+                          min="0"
+                          max={
+                            (() => {
+                              const b = tableBooks.find(x => x.title === student.bookName2);
+                              return b ? b.quantity : 1;
+                            })()
+                          }
+                          value={student.quantity2}
+                          onChange={(e) => setStudent(prev => ({ ...prev, quantity2: Number(e.target.value) }))}
+                          placeholder="Qty"
+                          className="tables-input-child"
+                          disabled={!student.bookName2}
+                        />
+                      </div>
+                    )}
+
+
+                    {student.bookName2 && student.quantity2 > 0 && (
+                      <div className="Student-form-input">
+
+                        <select
+                          className="tables-input-child"
+                          name="bookName3"
+                          value={student.bookName3}
+                          onChange={handlestudentdata}
+                        >
+                          <option value="">Select Book (3)</option>
+                          {filteredBooks.map((b) => (
+                            <option key={b.id} value={b.title}>{b.title}</option>
+                          ))}
+                        </select>
+
+                        {/* AVAILABLE COUNT SHOW */}
+                        {student.bookName3 && (
+                          <p style={{ margin: "5px 0", fontSize: "12px" }}>
+                            Available: {
+                              tableBooks.find(x => x.title === student.bookName3)?.quantity || 0
+                            }
+                          </p>
+                        )}
+
+                        <input
+                          type="number"
+                          min="0"
+                          max={
+                            (() => {
+                              const b = tableBooks.find(x => x.title === student.bookName3);
+                              return b ? b.quantity : 1;
+                            })()
+                          }
+                          value={student.quantity3}
+                          onChange={(e) => setStudent(prev => ({ ...prev, quantity3: Number(e.target.value) }))}
+                          placeholder="Qty"
+                          className="tables-input-child"
+                          disabled={!student.bookName3}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+
 
                   <input
                     className="tables-input-child"
@@ -515,7 +666,12 @@ function Tables() {
                               <div className="d-flex align-items-center prof-img-name">
                                 <div>
                                   <div className="fw-bold">{emp.studentName}</div>
-                                  <div className="text-muted small">{emp.bookName}  <span>Qty: {emp.quantity}</span></div>
+                                  {/* <div className="text-muted small">{emp.bookName}  <span>Qty: {emp.quantity}</span></div> */}
+                                  <div className="text-muted small">
+                                    {emp.bookName && `${emp.bookName} (Qty: ${emp.quantity})`}
+                                    {emp.bookName2 && <><br />{`${emp.bookName2} (Qty: ${emp.quantity2})`}</>}
+                                    {emp.bookName3 && <><br />{`${emp.bookName3} (Qty: ${emp.quantity3})`}</>}
+                                  </div>
                                 </div>
                               </div>
                             </td>
