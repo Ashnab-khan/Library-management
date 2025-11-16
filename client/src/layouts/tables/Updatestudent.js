@@ -145,7 +145,7 @@ function Updatestudent() {
                 if (selectedBook2) {
                     await axios.post(
                         `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook2.id}/increment`,
-                        { quantity2: received2 }
+                        { quantity: received2 }
                     );
                 }
             }
@@ -158,18 +158,18 @@ function Updatestudent() {
                 if (selectedBook3) {
                     await axios.post(
                         `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook3.id}/increment`,
-                        { quantity3: received3 }
+                        { quantity: received3 }
                     );
                 }
             }
 
             // Step 4: Agar ab quantity == 0 hai toh status automatically Received kar do
-            // if (Number(quantity) === 0 && status !== "Received") {
-            //     await axios.put(
-            //         `https://library-management-s4mr.onrender.com/studentdata/${StudentId}`,
-            //         { ...student, status: "Received" }
-            //     );
-            // }
+            if (Number(quantity) === 0 && status !== "Received") {
+                await axios.put(
+                    `https://library-management-s4mr.onrender.com/studentdata/${StudentId}`,
+                    { ...student, status: "Received" }
+                );
+            }
 
             alert("✅ Student & Library data updated successfully!");
         } catch (err) {
