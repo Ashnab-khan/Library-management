@@ -52,6 +52,7 @@ import Addnewbook from "layouts/tables/Addnewbook";
 import LibSignIn from "layouts/profile/LibSignIn";
 import LibSignOut from "layouts/profile/LibSignOut";
 import LibChangePassword from "layouts/profile/LibChangePassword";
+import Bulkupload from "layouts/dashboard/bulkupload/Bulkupload";
 
 const routes = [
   {
@@ -105,11 +106,11 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Notifications",
+    name: "Bulkupload",
     key: "notifications",
     icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
+    route: "/Bulkupload",
+    component: <Bulkupload />,
   },
   {
     type: "collapse",

@@ -4,15 +4,7 @@ import cors from "cors"
 import mysql from "mysql2";
 
 import dotenv from "dotenv";
-
-
-// import multer from "multer";
-// import path from "path";
-// import fs from "fs";
-// import { fileURLToPath } from "url";
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+import XLSX from "xlsx";
 
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
@@ -262,84 +254,63 @@ app.put("/changepasswordlibrary", (req, res) => {
 
 
 // ----------------------------------------------------------
+// Bulkupload
+// ----------------------------------------------------------
+app.post("/bulkupload", upload.single("file"), (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No Excel file uploaded" });
+        }
+
+        // Step 1: Read uploaded Excel file
+        const workbook = XLSX.readFile(req.file.path);
+        const sheetName = workbook.SheetNames[0];
+        const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+        console.log("EXCEL DATA:", sheetData);
+
+        // Step 2: Insert all rows into DB
+        const insertQuery = `
+            INSERT INTO librarybooks 
+            (title, standard, description, price, cover, quantity)
+            VALUES ?
+        `;
+
+        const values = sheetData.map(row => [
+            row.title || null,
+            row.standard || null,
+            row.description || null,
+            row.price || null,
+            row.cover || null,
+            row.quantity || 0
+        ]);
+
+        db.query(insertQuery, [values], (err, data) => {
+            if (err) {
+                console.log("Bulk Upload SQL Error:", err);
+                return res.status(500).json({ message: "Insert failed", error: err });
+            }
+
+            return res.json({
+                success: true,
+                message: `${values.length} books uploaded successfully`,
+            });
+        });
+
+    } catch (error) {
+        console.error("Bulk Upload Error:", error);
+        return res.status(500).json({ message: "Error processing file", error });
+    }
+});
+
+// ----------------------------------------------------------
+// Bulkupload
+// ----------------------------------------------------------
+
+
+// ----------------------------------------------------------
 // librarybooks
 // ----------------------------------------------------------
-// app.post("/librarybooks", (req, res) => {
-//     const q = "INSERT INTO librarybooks (`title`, `standard`  , `description`, `price`, `cover` , `quantity`) VALUES (?)";
-//     const values = [
-//         req.body.title,
-//         req.body.standard,
-//         req.body.description,
-//         req.body.price,
-//         req.body.cover,
-//         req.body.quantity || 0
-//     ];
-
-//     db.query(q, [values], (err, data) => {
-//         if (err) {
-//             console.error("❌ SQL Insert Error:", err);
-//             return res.status(500).json({ message: "Database Insert Failed", error: err });
-//         }
-//         console.log("✅ Book Added:", values);
-//         return res.json({ success: true, data });
-//     });
-// });
-
-
-// === POST route that accepts an image ===
-// Note: field name must match form data key (we'll use "cover")
-// app.post("/librarybooks", upload.single("cover"), (req, res) => {
-//     try {
-//         // If multer saved file, req.file will exist
-//         const coverPath = req.file ? `uploads/${req.file.filename}` : req.body.cover || null;
-
-//         const q = "INSERT INTO librarybooks (`title`, `standard`, `description`, `price`, `cover`, `quantity`) VALUES (?)";
-//         const values = [
-//             req.body.title || null,
-//             req.body.standard || null,
-//             req.body.description || null,
-//             req.body.price || null,
-//             coverPath,                    // store relative path like 'uploads/1669...-img.jpg'
-//             req.body.quantity || 0
-//         ];
-
-//         db.query(q, [values], (err, data) => {
-//             if (err) {
-//                 console.error("SQL Insert Error:", err);
-//                 return res.status(500).json({ message: "Database Insert Failed", error: err });
-//             }
-//             return res.json({ success: true, data });
-//         });
-//     } catch (err) {
-//         console.error("Upload error:", err);
-//         return res.status(500).json({ message: "Server error", error: err });
-//     }
-// });
-
-
-// Make sure 'uploads' folder exists in the same dir as this file
-// Serve uploaded files statically at /uploads
-// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-
-// const uploadDir = path.join(__dirname, "uploads");
-
-// // ✅ Ensure uploads folder exists (important for Render)
-// if (!fs.existsSync(uploadDir)) {
-//     fs.mkdirSync(uploadDir, { recursive: true });
-// }
-
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//         cb(null, uploadDir); // upload destination
-//     },
-//     filename: (req, file, cb) => {
-//         const uniqueSuffix = Date.now() + "-" + file.originalname;
-//         cb(null, uniqueSuffix);
-//     },
-// });
-
-// const upload = multer({ storage });
 
 const storage = new CloudinaryStorage({
     cloudinary,
@@ -353,39 +324,38 @@ const upload = multer({ storage });
 
 
 
-app.post("/librarybooks", upload.single("cover"), (req, res) => {
-    try {
-        const coverUrl = req.file ? req.file.path : null;  // Cloudinary URL
+// app.post("/librarybooks", upload.single("cover"), (req, res) => {
+//     try {
+//         const coverUrl = req.file ? req.file.path : null;  // Cloudinary URL
 
-        const q = `
-            INSERT INTO librarybooks 
-            (title, standard, description, price, cover, quantity)
-            VALUES (?)
-        `;
+//         const q = `
+//             INSERT INTO librarybooks 
+//             (title, standard, description, price, cover, quantity)
+//             VALUES (?)
+//         `;
 
-        const values = [
-            req.body.title || null,
-            req.body.standard || null,
-            req.body.description || null,
-            req.body.price || null,
-            coverUrl,
-            req.body.quantity || 0
-        ];
+//         const values = [
+//             req.body.title || null,
+//             req.body.standard || null,
+//             req.body.description || null,
+//             req.body.price || null,
+//             coverUrl,
+//             req.body.quantity || 0
+//         ];
 
-        db.query(q, [values], (err, data) => {
-            if (err) {
-                console.error("SQL ERROR:", err);
-                return res.status(500).json({ message: "DB insert failed", error: err });
-            }
-            return res.json({ success: true, data });
-        });
+//         db.query(q, [values], (err, data) => {
+//             if (err) {
+//                 console.error("SQL ERROR:", err);
+//                 return res.status(500).json({ message: "DB insert failed", error: err });
+//             }
+//             return res.json({ success: true, data });
+//         });
 
-    } catch (error) {
-        console.error("SERVER ERROR:", error);
-        return res.status(500).json({ message: "Server error", error });
-    }
-});
-
+//     } catch (error) {
+//         console.error("SERVER ERROR:", error);
+//         return res.status(500).json({ message: "Server error", error });
+//     }
+// });
 
 
 // --------------------------------------------
@@ -397,6 +367,76 @@ app.post("/librarybooks", upload.single("cover"), (req, res) => {
 //         return res.json(data)
 //     })
 // })
+
+
+app.post("/librarybooks", upload.single("cover"), (req, res) => {
+    try {
+        // --- 1️⃣ Validation ----
+        if (!req.body.title || !req.body.standard || !req.body.price) {
+            return res.status(400).json({
+                success: false,
+                message: "Required fields missing (title, standard, price)"
+            });
+        }
+
+        // --- 2️⃣ Cover Image Validation ----
+        const coverUrl = req.file ? req.file.path : null;
+
+        // --- 3️⃣ SQL Query ----
+        const q = `
+            INSERT INTO librarybooks 
+            (title, standard, description, price, cover, quantity)
+            VALUES (?)
+        `;
+
+        const values = [
+            req.body.title,
+            req.body.standard,
+            req.body.description || "",
+            req.body.price,
+            coverUrl,
+            req.body.quantity || 0
+        ];
+
+        db.query(q, [values], (err, data) => {
+            if (err) {
+                console.error("SQL ERROR:", err);
+
+                // Incorrect format, wrong column etc ➡️ 400
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid data or SQL error",
+                    error: err
+                });
+            }
+
+            // --- 4️⃣ If insert fails for unknown reasons ----
+            if (!data.affectedRows) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Book not added, try again"
+                });
+            }
+
+            // --- 5️⃣ SUCCESS ----
+            return res.status(201).json({
+                success: true,
+                message: "Book added successfully",
+                data: data
+            });
+        });
+
+    } catch (error) {
+        console.error("SERVER ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error
+        });
+    }
+});
+
 
 app.get("/librarybooks", (req, res) => {
     const q = "SELECT * FROM librarybooks";
@@ -432,37 +472,116 @@ app.get("/librarybooks", (req, res) => {
 // })
 
 // ✅ PUT with image
+// app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
+//     const bookId = req.params.id;
+
+//     // If new image uploaded → use Cloudinary URL
+//     // else → keep old image
+//     const coverPath = req.file ? req.file.path : req.body.cover;
+
+//     const q = `
+//     UPDATE librarybooks 
+//     SET title=?, standard=?, description=?, price=?, cover=?, quantity=? 
+//     WHERE id=?
+//   `;
+
+//     const values = [
+//         req.body.title,
+//         req.body.standard,
+//         req.body.description,
+//         req.body.price,
+//         coverPath,
+//         req.body.quantity || 0,
+//         bookId,
+//     ];
+
+//     db.query(q, values, (err, data) => {
+//         if (err) {
+//             console.log("SQL Update Error:", err);
+//             return res.status(500).json({ error: "Update failed", details: err });
+//         }
+//         res.json({ message: "Book updated successfully" });
+//     });
+// });
+
 app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
-    const bookId = req.params.id;
+    try {
+        const bookId = req.params.id;
 
-    // If new image uploaded → use Cloudinary URL
-    // else → keep old image
-    const coverPath = req.file ? req.file.path : req.body.cover;
-
-    const q = `
-    UPDATE librarybooks 
-    SET title=?, standard=?, description=?, price=?, cover=?, quantity=? 
-    WHERE id=?
-  `;
-
-    const values = [
-        req.body.title,
-        req.body.standard,
-        req.body.description,
-        req.body.price,
-        coverPath,
-        req.body.quantity || 0,
-        bookId,
-    ];
-
-    db.query(q, values, (err, data) => {
-        if (err) {
-            console.log("SQL Update Error:", err);
-            return res.status(500).json({ error: "Update failed", details: err });
+        // 1️⃣ Check ID valid or not
+        if (!bookId) {
+            return res.status(400).json({
+                success: false,
+                message: "Book ID is required"
+            });
         }
-        res.json({ message: "Book updated successfully" });
-    });
+
+        // 2️⃣ Required fields validation
+        if (!req.body.title || !req.body.standard || !req.body.price) {
+            return res.status(400).json({
+                success: false,
+                message: "Required fields missing (title, standard, price)"
+            });
+        }
+
+        // 3️⃣ Check if new cover uploaded or use old cover from body
+        const coverPath = req.file ? req.file.path : req.body.cover;
+
+        const q = `
+            UPDATE librarybooks 
+            SET title=?, standard=?, description=?, price=?, cover=?, quantity=? 
+            WHERE id=?
+        `;
+
+        const values = [
+            req.body.title,
+            req.body.standard,
+            req.body.description || "",
+            req.body.price,
+            coverPath,
+            req.body.quantity || 0,
+            bookId
+        ];
+
+        db.query(q, values, (err, data) => {
+            if (err) {
+                console.log("SQL Update Error:", err);
+
+                // SQL format wrong / missing column → 400 Bad Request
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid update request or SQL error",
+                    error: err
+                });
+            }
+
+            // 4️⃣ If no book found → 404
+            if (data.affectedRows === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Book not found"
+                });
+            }
+
+            // 5️⃣ Success → 200
+            return res.status(200).json({
+                success: true,
+                message: "Book updated successfully"
+            });
+        });
+
+    } catch (error) {
+        console.log("SERVER ERROR:", error);
+
+        // 6️⃣ 500 Internal Error
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error
+        });
+    }
 });
+
 
 //--------------- Update condition ---------------
 
