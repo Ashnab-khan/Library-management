@@ -667,7 +667,9 @@ app.post("/bulkupload", upload.single("file"), (req, res) => {
         });
 
     } catch (error) {
-        console.error("Bulk Upload Error:", error);
+        // console.error("Bulk Upload Error:", error);
+        alert(err.sqlMessage)
+        console.log("Bulk Upload SQL Error:", err.sqlMessage);
         return res.status(500).json({ message: "Error processing file", error });
     }
 });
