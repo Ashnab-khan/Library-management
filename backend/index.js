@@ -633,23 +633,31 @@ app.get("/librarybooks/:id/decrement", (req, res) => {
 // ----------------------------------------------------------
 // Bulkupload
 // ----------------------------------------------------------
-app.post("/bulkupload", upload.single("file"), async (req, res) => {
+// EXCEL upload storage
+const excelStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + "-" + file.originalname);
+    }
+});
+const uploadExcel = multer({ storage: excelStorage });
+
+
+app.post("/bulkupload", uploadExcel.single("file"), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: "No Excel file uploaded" });
         }
 
-        // Step 1: Read Excel File
         const workbook = XLSX.readFile(req.file.path);
         const sheetName = workbook.SheetNames[0];
         const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
         const values = [];
 
-        // Step 2: Loop through rows
         for (const row of sheetData) {
-
-            // 🔥 ab Cloudinary URL Excel se aayega
             const cloudinaryURL = row.cover;
 
             if (!cloudinaryURL) {
@@ -658,18 +666,16 @@ app.post("/bulkupload", upload.single("file"), async (req, res) => {
                 });
             }
 
-            // Prepare Data for MySQL
             values.push([
                 row.title || null,
                 row.standard || null,
                 row.description || null,
                 row.price || null,
-                cloudinaryURL,   // ✔ directly insert Cloudinary URL
+                cloudinaryURL,
                 row.quantity || 0
             ]);
         }
 
-        // Insert All Rows
         const insertQuery = `
             INSERT INTO librarybooks 
             (title, standard, description, price, cover, quantity)
@@ -693,7 +699,6 @@ app.post("/bulkupload", upload.single("file"), async (req, res) => {
         return res.status(500).json({ message: "Error processing file", error });
     }
 });
-
 
 
 
