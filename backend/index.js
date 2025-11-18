@@ -633,72 +633,39 @@ app.get("/librarybooks/:id/decrement", (req, res) => {
 // ----------------------------------------------------------
 // Bulkupload
 // ----------------------------------------------------------
-// EXCEL upload storage
-const excelStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/");
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + "-" + file.originalname);
-    }
-});
-const uploadExcel = multer({ storage: excelStorage });
-
+const uploadExcel = multer({ storage: multer.memoryStorage() });
 
 app.post("/bulkupload", uploadExcel.single("file"), async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ message: "No Excel file uploaded" });
-        }
+        const fileBuffer = req.file.buffer;
 
-        const workbook = XLSX.readFile(req.file.path);
-        const sheetName = workbook.SheetNames[0];
-        const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+        // Upload Excel file to Cloudinary
+        const uploadResult = await cloudinary.uploader.upload_stream(
+            {
+                resource_type: "raw",
+                folder: "excel-files"
+            },
+            async (error, result) => {
+                if (error) return res.status(500).json({ error });
 
-        const values = [];
+                console.log("Excel Uploaded:", result.secure_url);
 
-        for (const row of sheetData) {
-            const cloudinaryURL = row.cover;
+                // Read buffer (NOT from disk)
+                const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+                const sheetName = workbook.SheetNames[0];
+                const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-            if (!cloudinaryURL) {
-                return res.status(400).json({
-                    message: `Cover URL missing for title: ${row.title}`
-                });
+                // Insert into DB...
             }
+        );
 
-            values.push([
-                row.title || null,
-                row.standard || null,
-                row.description || null,
-                row.price || null,
-                cloudinaryURL,
-                row.quantity || 0
-            ]);
-        }
-
-        const insertQuery = `
-            INSERT INTO librarybooks 
-            (title, standard, description, price, cover, quantity)
-            VALUES ?
-        `;
-
-        db.query(insertQuery, [values], (err, data) => {
-            if (err) {
-                console.log("SQL ERROR:", err.sqlMessage);
-                return res.status(500).json({ message: "Insert failed", error: err });
-            }
-
-            return res.json({
-                success: true,
-                message: `${values.length} books uploaded successfully`
-            });
-        });
+        uploadResult.end(fileBuffer);
 
     } catch (error) {
-        console.error("Bulk Upload Error:", error);
-        return res.status(500).json({ message: "Error processing file", error });
+        return res.status(500).json({ error });
     }
 });
+
 
 
 
