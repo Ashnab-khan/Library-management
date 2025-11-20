@@ -39,6 +39,7 @@ import "../tables/tables.css"
 function Updatestudent() {
 
     const location = useLocation()
+    const navigate = useNavigate();
     console.log(location.pathname.split("/")[2], "want update id");
 
 
@@ -163,6 +164,53 @@ function Updatestudent() {
                 }
             }
 
+
+
+            // ---------------- DECREMENT LOGIC ------------------
+
+            // Book 1
+            if (quantity > 0 && bookName) {
+                const selectedBook = tableBooks.find(
+                    (b) => b.title === bookName && b.standard === standard
+                );
+
+                if (selectedBook) {
+                    await axios.post(
+                        `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook.id}/decrement`,
+                        { quantity: Number(quantity) }
+                    );
+                }
+            }
+
+            // Book 2
+            if (quantity2 > 0 && bookName2) {
+                const selectedBook2 = tableBooks.find(
+                    (b) => b.title === bookName2 && b.standard === standard
+                );
+
+                if (selectedBook2) {
+                    await axios.post(
+                        `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook2.id}/decrement`,
+                        { quantity: Number(quantity2) }
+                    );
+                }
+            }
+
+            // Book 3
+            if (quantity3 > 0 && bookName3) {
+                const selectedBook3 = tableBooks.find(
+                    (b) => b.title === bookName3 && b.standard === standard
+                );
+
+                if (selectedBook3) {
+                    await axios.post(
+                        `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook3.id}/decrement`,
+                        { quantity: Number(quantity3) }
+                    );
+                }
+            }
+
+
             // Step 4: Agar ab quantity == 0 hai toh status automatically Received kar do
             if (Number(quantity) === 0 && status !== "Received") {
                 await axios.put(
@@ -172,6 +220,7 @@ function Updatestudent() {
             }
 
             alert("✅ Student & Library data updated successfully!");
+            navigate("/tables");
         } catch (err) {
             console.error("Error updating student:", err);
             alert("❌ Failed to update student");

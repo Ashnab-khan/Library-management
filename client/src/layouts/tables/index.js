@@ -295,9 +295,8 @@ function Tables() {
           });
         }
       }
-
+      window.location.reload()
       alert("✅ Student added successfully!");
-      // window.location.reload()
     } catch (err) {
       console.error("Error adding student:", err);
       alert("❌ Failed to add student");
@@ -480,10 +479,10 @@ function Tables() {
                     value={student.standard}
                   >
                     <option value="">Select Standard</option>
-                    <option value="First">First</option>
-                    <option value="Second">Second</option>
-                    <option value="Third">Third</option>
-                    <option value="Fourth">Fourth</option>
+                    <option value="I">I</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
+                    <option value="VI">VI</option>
                     {/* <option value="Fourth">Fifth</option> */}
                   </select>
                 </div>
