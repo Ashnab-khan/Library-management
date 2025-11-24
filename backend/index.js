@@ -720,6 +720,52 @@ app.get("/bulkupload", (req, res) => {
 // ------------------------------------------------------------------
 
 // POST: create student with 3 books
+// app.post("/studentdata", (req, res) => {
+//     const q = `
+//     INSERT INTO studentdata
+//     (studentName, rollNo, divi, standard,
+//      bookName, quantity,
+//      bookName2, quantity2,
+//      bookName3, quantity3,
+//      currentDate, lastDate, status)
+//     VALUES (?)
+//   `;
+
+//     const formatDate = (d) => (d ? d.split("T")[0] : null);
+
+//     const values = [
+//         req.body.studentName || null,
+//         req.body.rollNo || null,
+//         req.body.divi || null,
+//         req.body.standard || null,
+
+//         // book 1
+//         req.body.bookName || null,
+//         Number(req.body.quantity) || 0,
+
+//         // book 2
+//         req.body.bookName2 || null,
+//         Number(req.body.quantity2) || 0,
+
+//         // book 3
+//         req.body.bookName3 || null,
+//         Number(req.body.quantity3) || 0,
+
+//         formatDate(req.body.currentDate),
+//         formatDate(req.body.lastDate),
+//         req.body.status || "Pending",
+//     ];
+
+//     db.query(q, [values], (err, data) => {
+//         if (err) {
+//             console.error("Insert error:", err);
+//             return res.status(500).json({ error: err });
+//         }
+
+//         return res.json({ success: true, insertedId: data.insertId });
+//     });
+// });
+
 app.post("/studentdata", (req, res) => {
     const q = `
     INSERT INTO studentdata
@@ -729,9 +775,27 @@ app.post("/studentdata", (req, res) => {
      bookName3, quantity3,
      currentDate, lastDate, status)
     VALUES (?)
-  `;
+    `;
 
     const formatDate = (d) => (d ? d.split("T")[0] : null);
+
+    // -----------------------------
+    // ⭐ VALIDATION: No past currentDate
+    // -----------------------------
+    const userDate = new Date(req.body.currentDate);
+    const today = new Date();
+
+    const toDateOnly = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+    if (toDateOnly(userDate) < toDateOnly(today)) {
+        return res.status(400).json({
+            error: true,
+            message: "You cannot select a past date. Current date must be today or future."
+        });
+    }
+    // -----------------------------
+    // END VALIDATION
+    // -----------------------------
 
     const values = [
         req.body.studentName || null,
@@ -739,15 +803,10 @@ app.post("/studentdata", (req, res) => {
         req.body.divi || null,
         req.body.standard || null,
 
-        // book 1
         req.body.bookName || null,
         Number(req.body.quantity) || 0,
-
-        // book 2
         req.body.bookName2 || null,
         Number(req.body.quantity2) || 0,
-
-        // book 3
         req.body.bookName3 || null,
         Number(req.body.quantity3) || 0,
 
@@ -765,6 +824,7 @@ app.post("/studentdata", (req, res) => {
         return res.json({ success: true, insertedId: data.insertId });
     });
 });
+
 
 
 // --------------------get------------------------
