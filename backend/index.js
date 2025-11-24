@@ -779,21 +779,34 @@ app.post("/studentdata", (req, res) => {
 
     const formatDate = (d) => (d ? d.split("T")[0] : null);
 
-    // -----------------------------
-    // ⭐ VALIDATION LOGIC HERE
-    // -----------------------------
+    // QUANTITIES
     const qty1 = Number(req.body.quantity) || 0;
     const qty2 = Number(req.body.quantity2) || 0;
     const qty3 = Number(req.body.quantity3) || 0;
 
-    if (req.body.status === "Received") {
-        if (qty1 > 0 || qty2 > 0 || qty3 > 0) {
-            return res.status(400).json({
-                error: true,
-                message: "Cannot set status to 'Received' while student still has books.",
-            });
-        }
+    const totalBooks = qty1 + qty2 + qty3;
+    const status = req.body.status;
+
+    // -----------------------------
+    // ⭐ VALIDATION RULES
+    // -----------------------------
+
+    // Rule 1: Student has books → cannot mark 'Received'
+    if (totalBooks > 0 && status === "Received") {
+        return res.status(400).json({
+            error: true,
+            message: "Status cannot be 'Received' because student still has books."
+        });
     }
+
+    // Rule 2: Student has NO books → cannot mark 'Pending'
+    if (totalBooks === 0 && status === "Pending") {
+        return res.status(400).json({
+            error: true,
+            message: "Status cannot be 'Pending' when student has no books."
+        });
+    }
+
     // -----------------------------
     // END VALIDATION
     // -----------------------------
@@ -811,7 +824,7 @@ app.post("/studentdata", (req, res) => {
         qty3,
         formatDate(req.body.currentDate),
         formatDate(req.body.lastDate),
-        req.body.status || "Pending",
+        status
     ];
 
     db.query(q, [values], (err, data) => {
@@ -823,7 +836,6 @@ app.post("/studentdata", (req, res) => {
         return res.json({ success: true, insertedId: data.insertId });
     });
 });
-
 
 
 // --------------------get------------------------
