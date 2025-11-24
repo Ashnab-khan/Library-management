@@ -150,6 +150,37 @@ app.put("/books/:id", (req, res) => {
 // -----------------------------------------------------------
 
 // ✅ LOGIN (Sign In)
+// app.post("/signinlibrary", (req, res) => {
+//     const { username, password } = req.body;
+
+//     if (!username || !password) {
+//         return res.status(400).json({ message: "Username and password required!" });
+//     }
+
+//     // ✅ Use your actual table name 'signinlibrary'
+//     const q = "SELECT * FROM signinlibrary WHERE username = ? AND password = ?";
+
+//     db.query(q, [username, password], (err, results) => {
+//         if (err) {
+//             console.error("❌ Login Error:", err);
+//             return res.status(500).json({ message: "Database error", error: err });
+//         }
+
+//         if (results.length > 0) {
+//             console.log("✅ User logged in:", username);
+//             return res.json({
+//                 success: true,
+//                 message: "Login successful!",
+//                 redirectUrl: "http://localhost:3000/dashboard",
+//             });
+//         } else {
+//             return res
+//                 .status(401)
+//                 .json({ success: false, message: "Invalid credentials!" });
+//         }
+//     });
+// });
+
 app.post("/signinlibrary", (req, res) => {
     const { username, password } = req.body;
 
@@ -157,29 +188,52 @@ app.post("/signinlibrary", (req, res) => {
         return res.status(400).json({ message: "Username and password required!" });
     }
 
-    // ✅ Use your actual table name 'signinlibrary'
-    const q = "SELECT * FROM signinlibrary WHERE username = ? AND password = ?";
+    // Step 1: Check if username exists
+    const checkUserQuery = "SELECT * FROM signinlibrary WHERE username = ?";
 
-    db.query(q, [username, password], (err, results) => {
+    db.query(checkUserQuery, [username], (err, userResult) => {
         if (err) {
             console.error("❌ Login Error:", err);
             return res.status(500).json({ message: "Database error", error: err });
         }
 
-        if (results.length > 0) {
-            console.log("✅ User logged in:", username);
+        // Username not found
+        if (userResult.length === 0) {
+            return res.status(401).json({
+                success: false,
+                message: "Your username is Incorrect"
+            });
+        }
+
+        // Username exists → now check password
+        const checkPassQuery = "SELECT * FROM signinlibrary WHERE username = ? AND password = ?";
+
+        db.query(checkPassQuery, [username, password], (err, finalResult) => {
+            if (err) {
+                console.error("❌ Login Error:", err);
+                return res.status(500).json({ message: "Database error", error: err });
+            }
+
+            // Password incorrect
+            if (finalResult.length === 0) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Your password is Incorrect"
+                });
+            }
+
+            // If both correct
             return res.json({
                 success: true,
                 message: "Login successful!",
                 redirectUrl: "http://localhost:3000/dashboard",
             });
-        } else {
-            return res
-                .status(401)
-                .json({ success: false, message: "Invalid credentials!" });
-        }
+        });
     });
 });
+
+
+
 
 // ✅ Optional: Get all users (for testing)
 app.get("/signinlibrary", (req, res) => {
