@@ -718,48 +718,54 @@ app.get("/bulkupload", (req, res) => {
 // ------------------------------------------------------------------
 // studentdata
 // ------------------------------------------------------------------
-// app.post("/studentdata", (req, res) => {
-//     // const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `divi`, `standard`, `quantity` , `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
 
+// POST: create student with 3 books
+// app.post("/studentdata", (req, res) => {
 //     const q = `
-//     INSERT INTO studentdata 
-//     (\`studentName\`, \`rollNo\`, \`divi\`, \`standard\`, \`bookName\`, \`quantity\`, \`currentDate\`, \`lastDate\`, \`status\`) 
+//     INSERT INTO studentdata
+//     (studentName, rollNo, divi, standard,
+//      bookName, quantity,
+//      bookName2, quantity2,
+//      bookName3, quantity3,
+//      currentDate, lastDate, status)
 //     VALUES (?)
 //   `;
 
-//     // Convert ISO date strings (from frontend) to YYYY-MM-DD
-//     const formatDate = (dateStr) => {
-//         if (!dateStr) return null;
-//         return dateStr.split("T")[0]; // "2025-11-04T00:00:00.000Z" → "2025-11-04"
-//     };
+//     const formatDate = (d) => (d ? d.split("T")[0] : null);
 
 //     const values = [
-//         req.body.studentName,
-//         req.body.rollNo,
-//         req.body.divi, // we are reading "div" from frontend
-//         req.body.standard,
-//         req.body.bookName,
-//         //  req.body.quantity || 1,
-//         Number(req.body.quantity),
-//         // req.body.currentDate,
-//         // req.body.lastDate,
+//         req.body.studentName || null,
+//         req.body.rollNo || null,
+//         req.body.divi || null,
+//         req.body.standard || null,
+
+//         // book 1
+//         req.body.bookName || null,
+//         Number(req.body.quantity) || 0,
+
+//         // book 2
+//         req.body.bookName2 || null,
+//         Number(req.body.quantity2) || 0,
+
+//         // book 3
+//         req.body.bookName3 || null,
+//         Number(req.body.quantity3) || 0,
+
 //         formatDate(req.body.currentDate),
 //         formatDate(req.body.lastDate),
-//         req.body.status || "Pending", // <-- Default to 'Pending'
+//         req.body.status || "Pending",
 //     ];
 
 //     db.query(q, [values], (err, data) => {
 //         if (err) {
-//             console.error("Error inserting student:", err);
-//             return res.status(500).json({ message: "Database insert failed" });
+//             console.error("Insert error:", err);
+//             return res.status(500).json({ error: err });
 //         }
-//         // return res.json({ message: "Student added successfully!" });
-//         return res.json({ success: true, data });
+
+//         return res.json({ success: true, insertedId: data.insertId });
 //     });
 // });
 
-
-// POST: create student with 3 books
 app.post("/studentdata", (req, res) => {
     const q = `
     INSERT INTO studentdata
@@ -769,28 +775,40 @@ app.post("/studentdata", (req, res) => {
      bookName3, quantity3,
      currentDate, lastDate, status)
     VALUES (?)
-  `;
+    `;
 
     const formatDate = (d) => (d ? d.split("T")[0] : null);
+
+    // -----------------------------
+    // ⭐ VALIDATION LOGIC HERE
+    // -----------------------------
+    const qty1 = Number(req.body.quantity) || 0;
+    const qty2 = Number(req.body.quantity2) || 0;
+    const qty3 = Number(req.body.quantity3) || 0;
+
+    if (req.body.status === "Received") {
+        if (qty1 > 0 || qty2 > 0 || qty3 > 0) {
+            return res.status(400).json({
+                error: true,
+                message: "Cannot set status to 'Received' while student still has books.",
+            });
+        }
+    }
+    // -----------------------------
+    // END VALIDATION
+    // -----------------------------
 
     const values = [
         req.body.studentName || null,
         req.body.rollNo || null,
         req.body.divi || null,
         req.body.standard || null,
-
-        // book 1
         req.body.bookName || null,
-        Number(req.body.quantity) || 0,
-
-        // book 2
+        qty1,
         req.body.bookName2 || null,
-        Number(req.body.quantity2) || 0,
-
-        // book 3
+        qty2,
         req.body.bookName3 || null,
-        Number(req.body.quantity3) || 0,
-
+        qty3,
         formatDate(req.body.currentDate),
         formatDate(req.body.lastDate),
         req.body.status || "Pending",
@@ -805,6 +823,7 @@ app.post("/studentdata", (req, res) => {
         return res.json({ success: true, insertedId: data.insertId });
     });
 });
+
 
 
 // --------------------get------------------------
